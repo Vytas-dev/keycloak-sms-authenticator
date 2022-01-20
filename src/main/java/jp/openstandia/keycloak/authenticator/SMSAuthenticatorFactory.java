@@ -14,107 +14,91 @@ import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 import org.keycloak.provider.ProviderConfigurationBuilder;
 
-public class SMSAuthenticatorFactory implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
+public class SMSAuthenticatorFactory
+    implements AuthenticatorFactory, ConfigurableAuthenticatorFactory {
 
-	public static final String PROVIDER_ID = "sms-authenticator-with-twilio";
-	private static final SMSAuthenticator SINGLETON = new SMSAuthenticator();
-	private static final Logger logger = Logger.getLogger(SMSAuthenticatorFactory.class.getPackage().getName());
+  public static final String PROVIDER_ID = "sms-authenticator-with-twilio";
+  private static final SMSAuthenticator SINGLETON = new SMSAuthenticator();
+  private static final Logger logger =
+      Logger.getLogger(SMSAuthenticatorFactory.class.getPackage().getName());
 
-	private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
-			AuthenticationExecutionModel.Requirement.REQUIRED,
-			AuthenticationExecutionModel.Requirement.DISABLED
-	};
+  private static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
+    AuthenticationExecutionModel.Requirement.REQUIRED,
+    AuthenticationExecutionModel.Requirement.DISABLED
+  };
 
-	private static final List<ProviderConfigProperty> configProperties;
-	static {
-        configProperties = ProviderConfigurationBuilder
-                .create()
-                .property()
-                .name(SMSAuthContstants.CONFIG_SMS_API_KEY)
-                .label("API-KEY")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("")
-                .add()
+  private static final List<ProviderConfigProperty> configProperties;
 
-                .property()
-                .name(SMSAuthContstants.CONFIG_PROXY_FLAG)
-                .label("Proxy Enabled")
-                .type(ProviderConfigProperty.BOOLEAN_TYPE)
-                .defaultValue(false)
-                .helpText("")
-                .add()
+  static {
+    configProperties =
+        ProviderConfigurationBuilder.create()
+            .property()
+            .name(SMSAuthContstants.CONFIG_TWILIO_ACCOUNT_SID)
+            .label("Twilio Account SID")
+            .type(ProviderConfigProperty.STRING_TYPE)
+            .helpText("")
+            .add()
+            .property()
+            .name(SMSAuthContstants.CONFIG_TWILIO_AUTH_TOKEN)
+            .label("Twilio Auth Token")
+            .type(ProviderConfigProperty.STRING_TYPE)
+            .helpText("")
+            .add()
+            .property()
+            .name(SMSAuthContstants.CONFIG_TWILIO_SERVICE_SID)
+            .label("Twilio Service SID")
+            .type(ProviderConfigProperty.STRING_TYPE)
+            .helpText("")
+            .add()
+            .build();
+  }
 
-                .property()
-                .name(SMSAuthContstants.CONFIG_PROXY_URL)
-                .label("Proxy URL")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("")
-                .add()
+  public Authenticator create(KeycloakSession session) {
+    return SINGLETON;
+  }
 
-                .property()
-                .name(SMSAuthContstants.CONFIG_PROXY_PORT)
-                .label("Proxy Port")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("")
-                .add()
+  public String getId() {
+    return PROVIDER_ID;
+  }
 
-                .property()
-                .name(SMSAuthContstants.CONFIG_CODE_LENGTH)
-                .label("SMS Code Length")
-                .type(ProviderConfigProperty.STRING_TYPE)
-                .helpText("")
-                .defaultValue(4)
-                .add()
+  public void init(Scope scope) {
+    logger.debug("Method [init]");
+  }
 
-                .build();
-	}
+  public void postInit(KeycloakSessionFactory factory) {
+    logger.debug("Method [postInit]");
+  }
 
-	public Authenticator create(KeycloakSession session) {
-		return SINGLETON;
-	}
+  public List<ProviderConfigProperty> getConfigProperties() {
+    return configProperties;
+  }
 
-	public String getId() {
-		return PROVIDER_ID;
-	}
+  public String getHelpText() {
+    return "SMS Authenticate using Twilio.";
+  }
 
-	public void init(Scope scope) {
-		logger.debug("Method [init]");
-	}
+  public String getDisplayType() {
+    return "Twilio SMS Authentication";
+  }
 
-	public void postInit(KeycloakSessionFactory factory) {
-		logger.debug("Method [postInit]");
-	}
+  public String getReferenceCategory() {
+    logger.debug("Method [getReferenceCategory]");
+    return "sms-auth-code";
+  }
 
-	public List<ProviderConfigProperty> getConfigProperties() {
-		return configProperties;
-	}
+  public boolean isConfigurable() {
+    return true;
+  }
 
-	public String getHelpText() {
-		return "SMS Authenticate using Twilio.";
-	}
+  public Requirement[] getRequirementChoices() {
+    return REQUIREMENT_CHOICES == null ? null : (Requirement[]) REQUIREMENT_CHOICES.clone();
+  }
 
-	public String getDisplayType() {
-		return "Twilio SMS Authentication";
-	}
+  public boolean isUserSetupAllowed() {
+    return true;
+  }
 
-	public String getReferenceCategory() {
-		logger.debug("Method [getReferenceCategory]");
-        return "sms-auth-code";
-	}
-
-	public boolean isConfigurable() {
-		return true;
-	}
-
-	public Requirement[] getRequirementChoices() {
-		return REQUIREMENT_CHOICES == null ? null : (Requirement[]) REQUIREMENT_CHOICES.clone();
-	}
-
-	public boolean isUserSetupAllowed() {
-		return true;
-	}
-
-	public void close() {
-		logger.debug("<<<<<<<<<<<<<<< SMSAuthenticatorFactory close");
-	}
+  public void close() {
+    logger.debug("<<<<<<<<<<<<<<< SMSAuthenticatorFactory close");
+  }
 }
